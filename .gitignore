@@ -1,0 +1,6 @@
+.idea
+*.jar
+.bsp
+.scala-build
+out
+.DS_Store
