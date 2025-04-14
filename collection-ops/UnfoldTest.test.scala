@@ -1,69 +1,63 @@
 //> using scala 3.6.4
 //> using test.dep org.scalameta::munit::1.1.0
+import java.time._
 
 class UnfoldTest extends munit.FunSuite {
-  case class Log(timestamp: Long)
+  case class Log(timestamp: ZonedDateTime, message: String)
+
+  def zdt(str: String): ZonedDateTime = ZonedDateTime.parse(str)
+
+  def truncateTo5Min(zdt: ZonedDateTime): ZonedDateTime = {
+    val min = zdt.getMinute - (zdt.getMinute % 5)
+    zdt.withMinute(min).withSecond(0).withNano(0)
+  }
 
   val logs = List(
-    Log(0),
-    Log(60),
-    Log(120),
-    Log(310),
-    Log(320),
-    Log(330),
-    Log(700)
+    Log(zdt("2025-04-01T00:00:12Z"), "A"),
+    Log(zdt("2025-04-01T00:01:20Z"), "B"),
+    Log(zdt("2025-04-01T00:03:00Z"), "C"),
+    Log(zdt("2025-04-01T00:05:10Z"), "D"),
+    Log(zdt("2025-04-01T00:06:30Z"), "E"),
+    Log(zdt("2025-04-01T00:10:05Z"), "F")
   ).sortBy(_.timestamp)
 
-  def splitIntoBatches(logs: List[Log], windowSize: Long): List[List[Log]] = {
+  def splitInto5MinBuckets(
+      logs: List[Log]
+  ): List[(ZonedDateTime, List[Log])] = {
     LazyList
       .unfold(logs) { // `logs` is the initial state
         case Nil => None
-        case xs => // `xs` is the current state
-          val start = xs.head.timestamp
-          val (batch, rest) = xs.span(_.timestamp < start + windowSize)
+        case remaining => // `remaining` is the current state
+          val windowStart = truncateTo5Min(remaining.head.timestamp)
+          val windowEnd = windowStart.plusMinutes(5)
 
-          // `batch` is the result of this iteration
+          val (inWindow, rest) = remaining.span { log =>
+            !log.timestamp
+              .isBefore(windowStart) && log.timestamp.isBefore(windowEnd)
+          }
+
+          // `(windowStart, inWindow)` is the result for this iteration
           // `rest` is the state for the next iteration
-          Some((batch, rest))
+          Some((windowStart, inWindow) -> rest)
       }
       .toList
   }
 
-  test("split logs into 3 batches of 5 minutes") {
+  test("group logs correctly") {
     assertEquals(
-      splitIntoBatches(logs, 300L).toList,
+      splitInto5MinBuckets(logs),
       List(
-        List(
-          Log(0),
-          Log(60),
-          Log(120)
+        zdt("2025-04-01T00:00:00Z") -> List(
+          Log(zdt("2025-04-01T00:00:12Z"), "A"),
+          Log(zdt("2025-04-01T00:01:20Z"), "B"),
+          Log(zdt("2025-04-01T00:03:00Z"), "C")
         ),
-        List(
-          Log(310),
-          Log(320),
-          Log(330)
+        zdt("2025-04-01T00:05:00Z") -> List(
+          Log(zdt("2025-04-01T00:05:10Z"), "D"),
+          Log(zdt("2025-04-01T00:06:30Z"), "E")
         ),
-        List(
-          Log(700)
-        )
-      )
-    )
-  }
-
-  test("split logs into 2 batches of 6 minutes") {
-    assertEquals(
-      splitIntoBatches(logs, 360L).toList,
-      List(
-        List(
-          Log(0),
-          Log(60),
-          Log(120),
-          Log(310),
-          Log(320),
-          Log(330)
-        ),
-        List(
-          Log(700)
+        zdt("2025-04-01T00:10:00Z") -> List(
+          Log(zdt("2025-04-01T00:10:05Z"), "F")
         )
       )
     )
