@@ -36,7 +36,7 @@ class DropWhileTakeWhileTest extends munit.FunSuite {
   val testFuncName = "extractFirstIncreasingSegment"
 
   test(s"$testFuncName should return extract the first increasing segment") {
-    val data = List(10, 8, 7, 8, 9, 13, 11, 15)
+    val data = List(10, 8, 7, 7, 8, 9, 13, 13, 11, 15)
     val expected = List(7, 8, 9, 13)
     assertEquals(extractFirstIncreasingSegment(data), expected)
   }
