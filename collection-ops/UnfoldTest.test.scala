@@ -43,6 +43,21 @@ class UnfoldTest extends munit.FunSuite {
       .toList
   }
 
+  test("truncateTo5Min should truncate to the nearest 5-minute mark") {
+    assertEquals(
+      truncateTo5Min(zdt("2025-04-01T00:01:20Z")),
+      zdt("2025-04-01T00:00:00Z")
+    )
+    assertEquals(
+      truncateTo5Min(zdt("2025-04-01T00:00:00Z")),
+      zdt("2025-04-01T00:00:00Z")
+    )
+    assertEquals(
+      truncateTo5Min(zdt("2025-03-31T23:59:59Z")),
+      zdt("2025-03-31T23:55:00Z")
+    )
+  }
+
   test("splitInto5MinBuckets should group logs into 5-minute buckets") {
     assertEquals(
       splitInto5MinBuckets(logs),
