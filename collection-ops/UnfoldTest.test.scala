@@ -43,7 +43,7 @@ class UnfoldTest extends munit.FunSuite {
       .toList
   }
 
-  test("group logs correctly") {
+  test("splitInto5MinBuckets should group logs into 5-minute buckets") {
     assertEquals(
       splitInto5MinBuckets(logs),
       List(

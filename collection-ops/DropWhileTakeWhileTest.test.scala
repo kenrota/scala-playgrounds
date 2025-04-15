@@ -33,19 +33,25 @@ class DropWhileTakeWhileTest extends munit.FunSuite {
       else taken.map(_._1) :+ taken.last._2
     }
 
-  test("return the first increasing segment") {
+  val testFuncName = "extractFirstIncreasingSegment"
+
+  test(s"$testFuncName should return extract the first increasing segment") {
     val data = List(10, 8, 7, 8, 9, 13, 11, 15)
     val expected = List(7, 8, 9, 13)
     assertEquals(extractFirstIncreasingSegment(data), expected)
   }
 
-  test("return an empty list when no increasing segment is found") {
+  test(
+    f"$testFuncName should return an empty list when no increasing segment is found"
+  ) {
     val data = List(10, 8, 7, 6, 3)
     val expected = List()
     assertEquals(extractFirstIncreasingSegment(data), expected)
   }
 
-  test("return the entire list when all elements are in increasing order") {
+  test(
+    s"$testFuncName should return entire list when all elements are increasing"
+  ) {
     val data = List(7, 8, 9, 13, 14, 15)
     val expected = List(7, 8, 9, 13, 14, 15)
     assertEquals(extractFirstIncreasingSegment(data), expected)

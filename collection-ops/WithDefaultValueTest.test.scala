@@ -21,12 +21,16 @@ class WithDefaultValueTest extends munit.FunSuite {
       .withDefaultValue(0)
   }
 
-  test("aggregate sales by category and return 0 for missing categories") {
+  test("aggregateSales should return correct sum for existing categories") {
     val result = aggregateSales(rawSales)
 
     assertEquals(result("Books"), 2000)
     assertEquals(result("Electronics"), 5000)
     assertEquals(result("Toys"), 2000)
+  }
+
+  test("aggregateSales should return default value for missing categories") {
+    val result = aggregateSales(rawSales)
 
     assertEquals(result("Clothing"), 0)
     assertEquals(result("Games"), 0)
