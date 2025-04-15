@@ -12,7 +12,7 @@ class UnfoldTest extends munit.FunSuite {
     zdt.withMinute(min).withSecond(0).withNano(0)
   }
 
-  val logs = List(
+  val logs: List[Log] = List(
     Log(zdt("2025-04-01T00:00:12Z"), "A"),
     Log(zdt("2025-04-01T00:01:20Z"), "B"),
     Log(zdt("2025-04-01T00:03:00Z"), "C"),
