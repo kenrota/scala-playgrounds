@@ -12,7 +12,7 @@ class UnfoldTest extends munit.FunSuite {
     zdt.withMinute(min).withSecond(0).withNano(0)
   }
 
-  val logs = List(
+  val logs: List[Log] = List(
     Log(zdt("2025-04-01T00:00:12Z"), "A"),
     Log(zdt("2025-04-01T00:01:20Z"), "B"),
     Log(zdt("2025-04-01T00:03:00Z"), "C"),
@@ -43,7 +43,22 @@ class UnfoldTest extends munit.FunSuite {
       .toList
   }
 
-  test("group logs correctly") {
+  test("truncateTo5Min should truncate to the nearest 5-minute mark") {
+    assertEquals(
+      truncateTo5Min(zdt("2025-04-01T00:01:20Z")),
+      zdt("2025-04-01T00:00:00Z")
+    )
+    assertEquals(
+      truncateTo5Min(zdt("2025-04-01T00:00:00Z")),
+      zdt("2025-04-01T00:00:00Z")
+    )
+    assertEquals(
+      truncateTo5Min(zdt("2025-03-31T23:59:59Z")),
+      zdt("2025-03-31T23:55:00Z")
+    )
+  }
+
+  test("splitInto5MinBuckets should group logs into 5-minute buckets") {
     assertEquals(
       splitInto5MinBuckets(logs),
       List(

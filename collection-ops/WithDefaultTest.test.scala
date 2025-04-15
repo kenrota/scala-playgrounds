@@ -24,7 +24,7 @@ class WithDefaultTest extends munit.FunSuite {
     }
   }
 
-  test("enrich logs with real and guest user names") {
+  test("enrichLogsWithUserNames should replace userId with userName") {
     val result = enrichLogsWithUserNames(logs)
 
     assertEquals(
